@@ -1,20 +1,26 @@
 # nodes/planner_node.py
 
+from chains.planner_chain import planner_chain
+from utils.debug_writer import debug_writer
+
+
+@debug_writer.debug_wrapper("planner")
 async def planner_node(state):
-    print(f"Planner node invoked with state:")
     goal = state["goal"]
     start_url = state["start_url"]
 
-    plan = {
-        "start_url": start_url,
-        "steps": [
-            "Open the start URL",
-            "Use browser tools to inspect the page",
-            "Take a screenshot",
-            "Explain the page content",
-        ],
-    }
+    page_data = state.get("page_data", "")
+
+    plan = await planner_chain.ainvoke(
+        {
+            "goal": goal,
+            "page_data": page_data,
+        }
+    )
 
     return {
-        "plan": plan
+        "plan": {
+            "start_url": start_url,
+            **plan,
+        }
     }

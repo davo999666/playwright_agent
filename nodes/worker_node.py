@@ -3,29 +3,25 @@
 import asyncio
 
 from chains.worker_chain import create_worker_chain
-from tools.tool_registry import get_tools_description
+from tools.tool_registry import get_tools, get_tools_description
+from utils.debug_writer import debug_writer
 
 
-def create_worker_node(tools):
-    """Create a worker node function with the provided tools."""
-    worker_chain = create_worker_chain(tools)
-    tools_description = get_tools_description(tools)
-    
-    async def worker_node(state):
-        print(f"Worker node invoked with state")
-        await asyncio.sleep(2)
+@debug_writer.debug_wrapper("worker")
+async def worker_node(state):
+    await asyncio.sleep(2)
 
-        response = worker_chain.invoke(
-            {
-                "goal": state["goal"],
-                "start_url": state["start_url"],
-                "plan": state.get("plan", {}),
-                "tools_description": tools_description,
-            }
-        )
+    worker_chain = create_worker_chain(get_tools())
 
-        return {
-            "messages": [response]
+    response = worker_chain.invoke(
+        {
+            "goal": state["goal"],
+            "start_url": state["start_url"],
+            "plan": state.get("plan", {}),
+            "tools_description": get_tools_description(),
         }
-    
-    return worker_node
+    )
+
+    return {
+        "messages": [response]
+    }

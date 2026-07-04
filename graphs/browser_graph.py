@@ -5,20 +5,20 @@ from langgraph.prebuilt import ToolNode
 
 from state import AgentState
 from nodes.planner_node import planner_node
-from nodes.worker_node import create_worker_node
+from nodes.worker_node import worker_node
 from nodes.final_node import final_node
+from tools.tool_registry import init_tools
 
 
 class BrowserGraph:
     def __init__(self, mcp_tools):
+        init_tools(mcp_tools)
         self.mcp_tools = mcp_tools
         self.app = self.graph()
 
     def graph(self):
         builder = StateGraph(AgentState)
 
-        # Create worker node with the MCP tools
-        worker_node = create_worker_node(self.mcp_tools)
 
         builder.add_node("planner", planner_node)
         builder.add_node("worker", worker_node)
