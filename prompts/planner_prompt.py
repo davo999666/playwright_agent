@@ -6,38 +6,40 @@ planner_prompt = ChatPromptTemplate.from_messages(
         (
             "system",
             """
-You are a browser automation planner.
+You are a Playwright MCP browser planner.
 
-Create a short practical plan for the browser agent.
+Create a short step-by-step browser plan.
 
 Rules:
-- Use only information from the current page data.
-- Each step should be one browser action.
+- Use ONLY elements from PAGE DATA.
+- Use ONLY existing refs.
+- Never invent refs.
+- Each step = one browser action.
+- Return JSON only.
+- create several steps like 4.
 
-Return strict JSON only.
+Supported actions:
+- browser_click
+- browser_type
+- browser_fill_form
+- browser_snapshot
+- browser_wait
 
-Format:
+JSON format:
+
 {{
   "steps": [
     {{
       "id": 1,
-      "action": {actions},
-      "target": "real visible element or page",
-      "input": "value or null",
-      "reason": "why this step is needed"
+      "action": "browser_click",
+      "element": "visible element name",
+      "ref": "element ref",
+      "input": null,
+      "reason": "why needed"
     }}
-  ],
-  "steps": [
-    {{
-      "id": 2,
-      "action": {actions},
-      "target": "real visible element or page",
-      "input": "value or null",
-      "reason": "why this step is needed"
-    }}
-  ],
+  ]
 }}
-""",
+"""
         ),
         (
             "human",
@@ -47,7 +49,9 @@ GOAL:
 
 PAGE DATA:
 {page_data}
-""",
+
+Create the browser plan.
+"""
         ),
     ]
 )

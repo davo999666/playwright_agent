@@ -6,16 +6,29 @@ from utils.debug_writer import debug_writer
 @debug_writer.debug_wrapper("validator")
 def validator_node(state):
     print("===validator_node===")
-    """
-    Check if all planned steps have been completed.
-    If yes, route to final. If no, route back to worker.
-    """
+
+    last = state["messages"][-1]
+    content = str(last.content)
+
+    # Tool failed: re-plan with fresh snapshot/refs
+    if "### Error" in content or "Error:" in content:
+        return {
+            "next_node": "planner",
+            "last_error": content,
+        }
+
+    # Page changed or MCP created new snapshot: refs changed, re-plan
+    if "Page URL:" in content or "Snapshot" in content:
+        return {
+            "next_node": "planner",
+            "last_error": None,
+        }
+
     plan = state.get("plan", {})
     steps = plan.get("steps", [])
     completed_steps = state.get("completed_steps", [])
 
     if not steps:
-        # No plan steps means task is done (worker finished on its own)
         return {"next_node": "end"}
 
     total_step_ids = [step["id"] for step in steps]

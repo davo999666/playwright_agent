@@ -10,7 +10,6 @@ from utils.debug_writer import debug_writer
 @debug_writer.debug_wrapper("worker")
 async def worker_node(state):
     print("===worker_node===")
-    await asyncio.sleep(2)
 
     worker_chain = create_worker_chain(get_tools())
 
@@ -55,6 +54,13 @@ async def worker_node(state):
                     matched_step = True
                     break
         
+        # Add delay before and after tool execution so user can see the browser action
+        if matched_step:
+            # Show current state before action
+            await asyncio.sleep(3)
+            # Show state after action completes
+            await asyncio.sleep(5)
+        
         # If no plan step was matched, check if all plan steps are already completed
         # In this case, the LLM is providing additional actions beyond the plan
         # We should still allow it to continue until it provides a final answer
@@ -73,8 +79,22 @@ async def worker_node(state):
                         new_completed_steps.append(step["id"])
                         break
     else:
-        # No tool calls — worker is providing a final answer, mark all steps done
-        new_completed_steps = [step["id"] for step in steps]
+        # No tool calls — this could mean:
+        # 1. The LLM is providing a final answer (task complete)
+        # 2. The LLM didn't call a tool when it should have (error case)
+        #
+        # We should only mark steps as complete if the LLM explicitly indicates
+        # the task is done. Otherwise, we should NOT mark any steps as complete
+        # to allow the workflow to continue and try again.
+        response_content = response.content if hasattr(response, 'content') else ""
+        # Check if response indicates task completion (no tool calls but has final answer)
+        if response_content and ("final answer" in response_content.lower() or "here is" in response_content.lower() or "i found" in response_content.lower()):
+            # LLM explicitly providing final answer
+            new_completed_steps = [step["id"] for step in steps]
+        else:
+            # LLM didn't call a tool but also didn't indicate completion
+            # Keep current completed_steps to allow retry
+            pass
 
     return {
         "messages": [response],

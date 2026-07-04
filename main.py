@@ -8,7 +8,7 @@ from mcp_client.playwright_client import get_mcp_tools
 
 async def main():
     goal = """
-            take screen shot and explain the content of the page.
+            Find an apartment to buy with a budget of $50,000.
             """
 
     start_url = "https://www.list.am/en/"

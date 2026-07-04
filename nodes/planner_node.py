@@ -1,5 +1,5 @@
 from chains.planner_chain import planner_chain
-from tools.tool_registry import get_tool_map, get_tools_names
+from tools.tool_registry import get_tool_map
 from utils.debug_writer import debug_writer
 
 
@@ -21,7 +21,6 @@ async def planner_node(state):
         {
             "goal": goal,
             "start_url": start_url,
-            "actions": get_tools_names(),
             "page_data": page_data,
         }
     )

@@ -15,8 +15,11 @@ async def get_mcp_tools():
             "playwright": {
                 "command": "npx",
                 "args": [
+                    "-y",
                     "@playwright/mcp@latest",
-                    "--browser=msedge",
+                    "--browser=chrome",
+                    "--viewport-size=1200x800",
+                    "--caps=vision,pdf,devtools,network,storage,testing",
                     # "--caps=network,storage,testing,vision,pdf,devtools"
                 ],
                 "transport": "stdio",

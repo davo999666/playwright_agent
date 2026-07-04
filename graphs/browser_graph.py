@@ -42,16 +42,17 @@ class BrowserGraph:
             },
         )
 
-        builder.add_edge("mcp_tools", "worker")
+        builder.add_edge("mcp_tools", "validator")
 
         builder.add_conditional_edges(
             "validator",
             self.validator_router,
             {
+                "planner": "planner",
                 "worker": "worker",
                 "final": "final",
             },
-        )
+)
 
         builder.add_edge("final", END)
 
@@ -67,8 +68,10 @@ class BrowserGraph:
         return "validator"
 
     def validator_router(self, state: AgentState):
-        """Route from validator: if all steps done, go to final; otherwise back to worker."""
         next_node = state.get("next_node", "worker")
+
+        if next_node == "planner":
+            return "planner"
 
         if next_node == "end":
             return "final"
