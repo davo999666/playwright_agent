@@ -14,6 +14,9 @@ class DebugWriter:
         self.log_dir = log_dir
         self.filepath = os.path.join(log_dir, filename)
         os.makedirs(log_dir, exist_ok=True)
+         # Clear old debug file on every app start
+        with open(self.filepath, "w", encoding="utf-8") as f:
+            f.write("")
 
     def _get_timestamp(self) -> str:
         return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
