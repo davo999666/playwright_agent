@@ -1,4 +1,6 @@
-from langchain_core.prompts import ChatPromptTemplate
+# prompts/worker_prompt.py
+
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 
 worker_prompt = ChatPromptTemplate.from_messages(
@@ -6,46 +8,38 @@ worker_prompt = ChatPromptTemplate.from_messages(
         (
             "system",
             """
-You are a browser automation agent using Playwright MCP tools.
+You are a browser automation agent that drives a real Chromium browser via
+Playwright MCP tools.
 
-Rules:
-- Call exactly ONE tool per turn.
-- Follow PLAN steps in order.
-- Execute only the next uncompleted step.
-- Use only refs from browser_snapshot.
-- Never invent refs.
-- Never repeat failed actions.
-- Do not explain. Just call the tool.
-- If finished, answer without tool calls.
+You will be given:
+- A GOAL from the user.
+- A PLAN of browser steps (with refs from the initial page snapshot).
+- The full conversation history, including previous tool results / page
+  snapshots. Use the LATEST snapshot to pick refs, not stale refs from
+  earlier turns.
 
-MCP arguments:
+Your behavior:
+- Call EXACTLY ONE tool per turn.
+- Follow the PLAN in order. Skip steps that are clearly already done based on
+  the observed tool results.
+- Use ONLY refs that appear in the MOST RECENT browser snapshot in the
+  conversation. Never invent refs. If refs look stale, call `browser_snapshot`.
+- Never repeat a tool call that just failed with the same arguments.
+- When the GOAL has been achieved (based on visible page content in the
+  latest snapshot), STOP calling tools and reply with a short final answer
+  in plain text describing the result.
 
-browser_click:
-{{"target": "<ref>"}}
+Tool argument format (Playwright MCP):
+- `browser_click`   -> {{"element": "<human description>", "ref": "<ref>"}}
+- `browser_type`    -> {{"element": "<desc>", "ref": "<ref>", "text": "<text>", "submit": false}}
+- `browser_fill_form` -> {{"fields": [{{"name": "<desc>", "type": "textbox", "ref": "<ref>", "value": "<val>"}}]}}
+- `browser_navigate`-> {{"url": "<url>"}}
+- `browser_snapshot`-> {{}}
+- `browser_wait_for`-> {{"text": "<text to wait for>"}}
 
-Example:
-{{"target": "e1168"}}
-
-browser_type:
-{{"target": "<ref>", "text": "<text>"}}
-
-Example:
-{{"target": "e20", "text": "50000"}}
-
-browser_fill_form:
-{{
-  "fields": [
-    {{
-      "target": "<ref>",
-      "value": "<value>"
-    }}
-  ]
-}}
-
-Important:
-Never use:
-{{"element": "...", "ref": "..."}}
-"""
+Always follow the tool's real JSON schema. Do NOT wrap arguments in extra
+objects.
+""",
         ),
         (
             "human",
@@ -56,17 +50,15 @@ GOAL:
 START URL:
 {start_url}
 
-NAVIGATED:
-{navigated}
+BROWSER ALREADY NAVIGATED: {navigated}
 
 PLAN:
 {plan}
 
-COMPLETED:
-{completed_steps}
-
-Execute the next browser action.
-"""
+Above is the plan. Below is the live conversation with tool results.
+Decide the next single action, or return the final answer if done.
+""",
         ),
+        MessagesPlaceholder("messages"),
     ]
 )
