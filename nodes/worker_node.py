@@ -15,7 +15,6 @@ async def worker_node(state):
 
     completed_steps = state.get("completed_steps", [])
     navigated = state.get("navigated", False)
-    page_data = state.get("page_data", "")
 
     response = worker_chain.invoke(
         {
@@ -25,7 +24,6 @@ async def worker_node(state):
             "tools_description": get_tools_description(),
             "completed_steps": completed_steps if completed_steps else "None",
             "navigated": str(navigated),
-            "page_data": page_data if page_data else "No page data available yet",
         }
     )
     usage = response.usage_metadata or {}

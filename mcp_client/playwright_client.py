@@ -3,6 +3,7 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 from langchain_mcp_adapters.tools import load_mcp_tools
 
 
+
 @asynccontextmanager
 async def get_mcp_tools():
     """
@@ -16,7 +17,7 @@ async def get_mcp_tools():
                 "args": [
                     "@playwright/mcp@latest",
                     "--browser=msedge",
-                    "--caps=network,storage,testing,vision,pdf,devtools"
+                    # "--caps=network,storage,testing,vision,pdf,devtools"
                 ],
                 "transport": "stdio",
             }

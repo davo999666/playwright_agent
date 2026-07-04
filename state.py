@@ -8,7 +8,6 @@ class AgentState(TypedDict):
     goal: str
     start_url: str
     plan: dict
-    page_data: str
     navigated: bool
     completed_steps: list[int]
     messages: Annotated[list[BaseMessage], add_messages]

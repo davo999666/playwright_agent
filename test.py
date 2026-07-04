@@ -3,23 +3,14 @@
 import asyncio
 
 from mcp_client.playwright_client import get_mcp_tools
-
-
+from tools.tool_registry import init_tools, get_tools_names
 
 
 async def main():
     async with get_mcp_tools() as tools:
-        print("TOOLS COUNT:", len(tools))
-        print("=" * 80)
+        init_tools(tools)
 
-        for tool in tools:
-            print("NAME:", tool.name)
-            print("TYPE:", type(tool))
-            print("DESCRIPTION:", tool.description)
-            print("ARGS:")
-            print(tool.args)
-
-            print("=" * 80)
+        print(get_tools_names())
 
 
 if __name__ == "__main__":

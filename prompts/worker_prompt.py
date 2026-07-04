@@ -49,9 +49,6 @@ START URL:
 
 ALREADY NAVIGATED: {navigated}
 
-CURRENT PAGE DATA:
-{page_data}
-
 PLAN:
 {plan}
 
