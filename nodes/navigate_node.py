@@ -6,6 +6,7 @@ from utils.debug_writer import debug_writer
 
 @debug_writer.debug_wrapper("navigate")
 async def navigate_node(state):
+    print("===navigate_node===")
     start_url = state["start_url"]
 
     tools = get_tool_map()
@@ -13,5 +14,5 @@ async def navigate_node(state):
     await tools["browser_navigate"].ainvoke({"url": start_url})
  
     return {
-        "next_node": "planner"
+        "navigated": True,
     }

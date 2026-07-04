@@ -5,6 +5,7 @@ from utils.debug_writer import debug_writer
 
 @debug_writer.debug_wrapper("planner")
 async def planner_node(state):
+    print("===planner_node===")
     goal = state["goal"]
     start_url = state["start_url"]
 

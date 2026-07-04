@@ -80,6 +80,7 @@ class BrowserGraph:
             {
                 "goal": goal,
                 "start_url": start_url,
+                "navigated": False,
                 "completed_steps": [],
                 "messages": [
                     {

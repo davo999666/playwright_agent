@@ -5,6 +5,7 @@ from utils.debug_writer import debug_writer
 
 @debug_writer.debug_wrapper("validator")
 def validator_node(state):
+    print("===validator_node===")
     """
     Check if all planned steps have been completed.
     If yes, route to final. If no, route back to worker.
